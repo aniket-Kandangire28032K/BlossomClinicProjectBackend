@@ -20,7 +20,7 @@ export const addPrescription = async (req, res) => {
 export const getPrescriptions = async (req, res) => {
   // Get Request
   try {
-    const prescriptions = await Prescription.find().sort({ createdAt: 1 });
+    const prescriptions = await Prescription.find().sort({ date:-1 });
     res.status(200).json(prescriptions);
   } catch (error) {
     res.status(500).json({ success: false, error });
@@ -30,7 +30,7 @@ export const getPrescriptions = async (req, res) => {
 export const getAPrescription = async (req,res) => {
   try {
     const {patientname} = req.query;
-    const PrescriptionData = await Prescription.findOne({patientname})
+    const PrescriptionData = await Prescription.findOne({patientname}).sort({date:-1})
 
    if (!PrescriptionData){
             return res.status(404).json({

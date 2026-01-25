@@ -20,7 +20,7 @@ export const addPrescription = async (req, res) => {
 export const getPrescriptions = async (req, res) => {
   // Get Request
   try {
-    const prescriptions = await Prescription.find().sort({ date:-1 });
+    const prescriptions = await Prescription.find();
     res.status(200).json(prescriptions);
   } catch (error) {
     res.status(500).json({ success: false, error });

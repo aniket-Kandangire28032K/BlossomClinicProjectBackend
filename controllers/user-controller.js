@@ -4,10 +4,9 @@ import  jwt  from "jsonwebtoken";
 export const login=async (req,res) => {
     const {name,password} = req.body;
     const user= await User.findOne({name});
-    if(!user) return res.json({success:false,message:'User not found'});
+    if(!user) return res.json({success:false,message:'User not found or Wrong User'});
 
-    if(password!=user.password) return res.json({message:'Wrong Password'});
-
+    if(password!=user.password) return res.json({success:false,message:'Wrong Password'});
 
     const token=jwt.sign({
         id:user._id,role:user.role

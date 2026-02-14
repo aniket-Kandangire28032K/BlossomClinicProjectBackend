@@ -1,10 +1,16 @@
 import mongoose from "mongoose";
 
+const productSchema= new mongoose.Schema({
+  medicinename:String,
+  stock:Number,
+  unitprice:Number,
+  totalprice:Number
+},{_id:false})
+
 const mrSchema = new mongoose.Schema({
   companyname: {
     type: String,
     trim: true,
-    lowercase: true,
   },
   mrname: {
     type: String,
@@ -20,10 +26,9 @@ const mrSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
-  productlist: {
-    type: String,
-    trim: true,
-    lowercase: true,
+  productlist:{
+    type:[productSchema],
+    default:[]
   },
   paidamount: {
     type: Number,
@@ -35,6 +40,10 @@ const mrSchema = new mongoose.Schema({
     type: Number,
   },
   date:{
+    type:String,
+    trim:true
+  },
+  nextpaydate:{
     type:String,
     trim:true
   }

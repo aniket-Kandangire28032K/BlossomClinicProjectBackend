@@ -8,3 +8,4 @@ router.get("/getprescription", getAPrescription);
 router.post("/prescription", addPrescription);
 
 export default router;
+

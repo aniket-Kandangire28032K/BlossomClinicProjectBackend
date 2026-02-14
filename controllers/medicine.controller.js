@@ -30,6 +30,22 @@ export const postMedicine = async (req, res) => {
     });
   }
 };
+
+export const postBulkMedicine = async (req,res) => {
+  try {
+    const newMedicine = await medicineModel.insertMany(req.body)
+    return res.status(201).json({
+      success:true,
+      message:"Medicine Added"
+    })
+
+  } catch (error) {
+    return res.status(500).json({
+      success:false,
+      message:"Internal Server Error"
+    })
+  }
+}
 //  get single Medicine
 export const getMedicine = async (req, res) => {
   try {

@@ -38,12 +38,21 @@ export const getOneMr = async (req, res) => {
 // Get MR list by Name
 export const getMrByName = async (req, res) => {
   try {
-    const { mrname } = req.body;
-    const mrList = await mrModel.find({ mrname: mrname });
+    const { mrname,date } = req.body;
+    const query = {}
+    if (!mrname && !date){
+      return res.status(400).json({ success:false,message:"Pleaser Provide Data"})
+    };
+    if(mrname){
+      query.mrname = mrname
+    }
+    if(date) {
+      query.date=date;
+    }
+    const mrList = await mrModel.find(query);
 
     if (!mrList || mrList.length === 0) {
       return res.status(200).json({
-        success: false,
         message: "MR not found"
       });
     }

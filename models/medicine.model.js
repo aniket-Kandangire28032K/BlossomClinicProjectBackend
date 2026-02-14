@@ -1,13 +1,18 @@
 import mongoose from "mongoose";
 
 const medicineSchema= new mongoose.Schema({
+    companyname:{
+        type:String,trim:true
+    },
     medicinename:{
         type:String,
-        trim:true
+        trim:true,
+        require:true
     },
     mrname:{
         type:String,
-        trim:true
+        trim:true,
+        require:true
     },
     batchno:{
         type:String,
@@ -16,9 +21,15 @@ const medicineSchema= new mongoose.Schema({
     expiredate:{
         type:String,
     },
-    stock:Number,
-    unitprice:Number,
-    totalprice:Number
+    stock:{
+        type:Number,require:true
+    },
+    unitprice:{
+        type:Number,require:true
+    },
+    totalprice:{
+        type:Number,require:true
+    }
 })
 
 const medicineModel = new mongoose.model('medicineModel',medicineSchema,'inventory');

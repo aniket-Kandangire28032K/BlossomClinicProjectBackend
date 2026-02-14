@@ -1,6 +1,5 @@
 import Prescription from "../models/prescriptions.model.js";
 
-
 export const addPrescription = async (req, res) => {
   // Post Request
   try {
@@ -30,7 +29,12 @@ export const getPrescriptions = async (req, res) => {
 export const getAPrescription = async (req,res) => {
   try {
     const {patientname} = req.query;
-    const PrescriptionData = await Prescription.findOne({patientname}).sort({date:-1})
+    const PrescriptionData = await Prescription.findOne({ 
+      $or:[
+                {patientname:new RegExp(patientname,"i")},
+                {opdno:patientname }
+            ]
+    }).sort({date:-1});
 
    if (!PrescriptionData){
             return res.status(404).json({

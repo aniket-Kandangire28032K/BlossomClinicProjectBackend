@@ -85,3 +85,31 @@ export const deleteUser=async (req,res) => {
         });
     }
 };
+
+export const patchUser = async (req,res) => {
+    try {
+        
+  
+    const {email, newpassword } = req.body;
+    if(!email || !newpassword){
+        return res.status(400).json({
+            message:"Email and New password are required"
+        })
+    }
+    const user = await User.findOne({email});
+    if(!user){
+        return res.status(404).json({
+            message:"User not found"
+        })
+    }
+    user.password = newpassword;
+    await user.save();
+    return res.status(200).json({
+        message:"Password Updated Successfully"
+    });
+      } catch (error) {
+     return res.status(500).json({
+        message:"Internal Server error"
+     })   
+    }
+};

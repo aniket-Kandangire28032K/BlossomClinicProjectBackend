@@ -29,7 +29,15 @@ const medicineSchema= new mongoose.Schema({
     },
     totalprice:{
         type:Number,require:true
-    }
+    },
+    stockindate:{
+        type:String
+    },
+    stockoutdate:{
+        type:String
+    },
+    stockin:Number,
+    stockout:Number
 })
 
 const medicineModel = new mongoose.model('medicineModel',medicineSchema,'inventory');

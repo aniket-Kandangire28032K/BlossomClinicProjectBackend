@@ -46,6 +46,9 @@ const mrSchema = new mongoose.Schema({
   nextpaydate:{
     type:String,
     trim:true
+  },paymentMethod:{
+      type:String,
+    trim:true
   }
 });
 

@@ -9,6 +9,7 @@ import prescription from './routes/prescription.routes.js'
 import Medicine from './routes/medicine.route.js'
 import Mr from './routes/mr.route.js'
 import Exprenses from "./routes/expenses.route.js"
+import Staff from "./routes/staff.route.js"
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -24,6 +25,8 @@ app.use('/api',prescription)
 app.use('/api',Medicine)
 app.use('/api',Mr)
 app.use('/api',Exprenses)
+app.use('/api/staff',Staff)
+
 
 // DB Connection
 const ConnectDB = async () => {

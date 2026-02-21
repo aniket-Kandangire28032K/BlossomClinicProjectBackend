@@ -36,7 +36,8 @@ export const postBulkMedicine = async (req,res) => {
     const newMedicine = await medicineModel.insertMany(req.body)
     return res.status(201).json({
       success:true,
-      message:"Medicine Added"
+      message:"Medicine Added",
+      newMedicine
     })
 
   } catch (error) {
@@ -79,7 +80,9 @@ export const updatemed=async (req,res) => {
         const updatedMedicine =await medicineModel.findOneAndUpdate(
             {medicinename:medicinename},
             {$set:{stock}},
-            {new:true}
+            {new:true},
+            {stockin:stock},
+            
         )
          if (!updatedMedicine) {
       return res.status(404).json({
@@ -140,7 +143,8 @@ export const updateMedicineStock = async (req, res) => {
       // 3️⃣ Subtract stock
       await medicineModel.findOneAndUpdate(
         { medicinename: item.name },
-        { $inc: { stock: -qty } }
+        { $inc: { stock: -qty } },
+        {$inc:{stockout: +qty}}
       );
     }
 

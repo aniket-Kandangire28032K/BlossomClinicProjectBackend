@@ -143,8 +143,8 @@ export const updateMedicineStock = async (req, res) => {
       // 3️⃣ Subtract stock
       await medicineModel.findOneAndUpdate(
         { medicinename: item.name },
-        { $inc: { stock: -qty } },
-        {$inc:{stockout: +qty}}
+        { $inc: { stock: -qty,stockout:qty }, $set:{stockoutdate:item.stockoutdate} }
+        
       );
     }
 

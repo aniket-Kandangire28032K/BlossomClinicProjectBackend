@@ -49,6 +49,12 @@ const mrSchema = new mongoose.Schema({
   },paymentMethod:{
       type:String,
     trim:true
+  },
+  lastpaymentdate:{
+    type:String,trim:true
+  },
+  lastpayment:{
+    type:Number
   }
 });
 

@@ -22,7 +22,7 @@ export const getExpense = async (req, res) => {
 
 export const getAllExpenses = async (req, res) => {
   try {
-    const expenses = await Expenses.find();
+    const expenses = (await Expenses.find().sort({_id:-1}));
     res.json(expenses);
   } catch (err) {
     res.status(500).json({ message: err.message });

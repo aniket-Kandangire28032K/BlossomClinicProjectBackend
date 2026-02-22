@@ -67,7 +67,7 @@ export const getMrByName = async (req, res) => {
   }
 };
 
-// // add Mr's to
+//  add Mr's to
 export const postMr=async(req,res)=>{
     try {
         const mr = await mrModel.create(req.body);
@@ -85,7 +85,7 @@ export const postMr=async(req,res)=>{
 // update MR dueamount
 export const updateMr = async (req,res) => {
     try {
-      const {_id ,paidamount,dueamount} = req.body;
+      const {_id ,paidamount,dueamount,lastpaymentdate,lastpayment} = req.body;
 
       if(!_id){
         return res.status(400).json({message:'ID is required'})
@@ -93,7 +93,7 @@ export const updateMr = async (req,res) => {
 
       const updated = await mrModel.findByIdAndUpdate(
         _id,
-        {paidamount,dueamount},
+        {paidamount,dueamount,lastpaymentdate,lastpayment},
         {new:true}
       );
 

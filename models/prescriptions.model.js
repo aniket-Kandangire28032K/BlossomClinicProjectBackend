@@ -27,6 +27,7 @@ const PrescriptionSchema = new mongoose.Schema(
 
     products:{type: [productSchema],default:[]},
     treatments:{type: [treatmentSchema],default:[]},
+    remark:String
   }
 );
 

@@ -110,3 +110,17 @@ export const updateMr = async (req,res) => {
       return res.status(500).json({message:'Server Error'})
     }
 };
+
+export const updateDate =async (req,res) =>{
+  try {
+    const {id} = req.params;
+    const {date}=req.body
+    const updates = await mrModel.findByIdAndUpdate(
+      id,
+      {$set:{nextpaydate:date}},
+    );
+    return res.status(200).json(updates)
+  } catch (error) {
+    return res.status(500).json({message:"Internal Server Error"})
+  }
+}

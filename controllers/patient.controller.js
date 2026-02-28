@@ -88,3 +88,41 @@ export const addPatient=async (req,res) => {
         
     }
 }
+
+export const updatePatient = async (req,res) => {
+    const {opdno,name,reference,history} = req.body;
+    try {
+    if(!opdno){
+        return res.status(400).json({
+            message:"OPD No. is Needed",
+            success:false
+        })
+    }
+    const updatedpatient = await Patient.findOneAndUpdate(
+        {opdno:opdno},
+        {
+            $set:{
+                name,reference,history
+            },
+        },
+        {new:true}
+    );
+    if(!updatedpatient){
+        return res.status(404).json({
+            message:"Patient Not Found",
+            success:false
+        })
+    }
+    return  res.status(200).json({
+            message:"Patient details Update",
+            success:true
+        })
+        
+    } catch (error) {
+       return res.status(500).json({
+        success:false,
+        message:"Internal Server Error",
+        error
+       }) 
+    }
+}

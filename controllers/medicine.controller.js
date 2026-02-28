@@ -79,9 +79,9 @@ export const updatemed=async (req,res) => {
         }
         const updatedMedicine =await medicineModel.findOneAndUpdate(
             {medicinename:medicinename},
-            {$set:{stock}},
-            {new:true},
+            {$inc:{stock}},
             {stockin:stock},
+            {new:true},
             
         )
          if (!updatedMedicine) {

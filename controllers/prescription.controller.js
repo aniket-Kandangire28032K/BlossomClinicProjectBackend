@@ -19,7 +19,7 @@ export const addPrescription = async (req, res) => {
 export const getPrescriptions = async (req, res) => {
   // Get Request
   try {
-    const prescriptions = await Prescription.find();
+    const prescriptions = await Prescription.find().sort({date:-1});
     res.status(200).json(prescriptions);
   } catch (error) {
     res.status(500).json({ success: false, error });
@@ -52,4 +52,32 @@ export const getAPrescription = async (req,res) => {
             message:'Internal Server Error'+ error
         })
     }
+}
+
+export const UpdatePrescription= async (req,res) => {
+  try {
+    const {id} = req.params;
+    const {nextAppointmentDate} = req.body;
+    const prescription = await Prescription.findByIdAndUpdate(
+      id,
+      {$set:{ nextAppointmentDate:nextAppointmentDate}},
+      {new:false}
+    )
+
+    if (!prescription){
+      return res.status(404).json({
+        message:"Patient Not Found",
+        success:false
+      })
+    }
+    return res.status(200).json({
+      message:`Appointment Rescheduled to ${nextAppointmentDate}`,
+      success:true
+    })
+  } catch (error) {
+      res.status(500).json({
+        message:"Internal Server Error",
+        success:false
+      })
+  }
 }

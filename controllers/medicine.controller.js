@@ -82,7 +82,6 @@ export const updatemed=async (req,res) => {
             {$inc:{stock}},
             {stockin:stock},
             {new:true},
-            
         )
          if (!updatedMedicine) {
       return res.status(404).json({

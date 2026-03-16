@@ -70,18 +70,18 @@ export const getMedicine = async (req, res) => {
 // put med in DB
 export const updatemed=async (req,res) => {
     try {
-        const {medicinename,stock}=req.body;
+        const {medicinename,stock,unitprice}=req.body;
         if (!medicinename || stock ===undefined){
             return res.status(400).json({
                 success:false,
                 message:'Both medicine Name and stock are required'
             });
         }
-        const updatedMedicine =await medicineModel.findOneAndUpdate(
+        const updatedMedicine = await medicineModel.findOneAndUpdate(
             {medicinename:medicinename},
-            {$inc:{stock}},
-            {stockin:stock},
+            {$inc:{stock},$set: { unitprice: unitprice, stockin: stock, }},
             {new:true},
+            
         )
          if (!updatedMedicine) {
       return res.status(404).json({

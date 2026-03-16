@@ -9,7 +9,8 @@ const productSchema = new mongoose.Schema({
 );
 const treatmentSchema = new mongoose.Schema({
   name: { type: String , lowercase:true },
-  price:Number
+  price:Number,
+  sessions:Number
 },{_id:false}
 );
 
@@ -24,7 +25,8 @@ const PrescriptionSchema = new mongoose.Schema(
     treatmentCost:{type:Number,default:0},
     totalCost:{type:Number},
     consultFee:{type:Number},
-
+    paidamount:{type:Number},
+    balanceamount:{type:Number},
     products:{type: [productSchema],default:[]},
     treatments:{type: [treatmentSchema],default:[]},
     remark:String

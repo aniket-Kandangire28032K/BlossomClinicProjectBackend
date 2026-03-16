@@ -85,7 +85,7 @@ export const postMr=async(req,res)=>{
 // update MR dueamount
 export const updateMr = async (req,res) => {
     try {
-      const {_id ,paidamount,dueamount,lastpaymentdate,lastpayment} = req.body;
+      const {_id ,paidamount,dueamount,lastpaymentdate,lastpayment,nextpaydate} = req.body;
 
       if(!_id){
         return res.status(400).json({message:'ID is required'})
@@ -93,7 +93,7 @@ export const updateMr = async (req,res) => {
 
       const updated = await mrModel.findByIdAndUpdate(
         _id,
-        {paidamount,dueamount,lastpaymentdate,lastpayment},
+        {paidamount,dueamount,lastpaymentdate,lastpayment,nextpaydate},
         {new:true}
       );
 

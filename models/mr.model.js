@@ -56,6 +56,8 @@ const mrSchema = new mongoose.Schema({
   lastpayment:{
     type:Number
   }
+},{
+  createdAt:true
 });
 
 const mrModel= new mongoose.model('mrmodel',mrSchema,'MRList');

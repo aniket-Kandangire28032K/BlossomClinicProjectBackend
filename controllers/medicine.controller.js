@@ -1,5 +1,6 @@
 import medicineModel from "../models/medicine.model.js";
 import DailyStock from "../models/dailyStocks.model.js" 
+import mrModel from "../models/mr.model.js";
 
 // ✅ Get all medicines
 export const getAllMedicine = async (req, res) => {
@@ -78,116 +79,69 @@ export const getMedicine = async (req, res) => {
 // 🔥 MAIN STOCK ENGINE (SALE / RETURN / PURCHASE / ADJUST)
 export const updatemed = async (req, res) => {
   try {
-    const { medicinename, stock, unitprice, type } = req.body;
+    const { medicinename, stock, unitprice, companyname } = req.body;
 
     if (!medicinename || stock === undefined) {
       return res.status(400).json({
         success: false,
-        message: "Medicine name & stock required",
+        message: "Medicine name and stock required",
       });
     }
 
-    const medicine = await medicineModel.findOne({ medicinename });
+    // ✅ 1. Update medicine stock
+    const updatedMedicine = await medicineModel.findOneAndUpdate(
+      { medicinename },
+      {
+        $inc: { stock: stock },
+        $set: {
+          unitprice: unitprice,
+          stockin: stock > 0 ? stock : 0,
+          stockout: stock < 0 ? Math.abs(stock) : 0,
+        },
+      },
+      { new: true }
+    );
 
-    if (!medicine) {
+    if (!updatedMedicine) {
       return res.status(404).json({
         success: false,
         message: "Medicine not found",
       });
     }
 
-    const today = new Date().toLocaleDateString("en-GB");
+    // ✅ 2. Find LAST MR entry for this company
+    const lastMR = await mrModel.findOne({ companyname })
+      .sort({ createdAt: -1 });
 
-    let daily = await DailyStock.findOne({ date: today });
+    if (lastMR) {
+      let totalChange = stock * (unitprice || 0);
 
-    if (!daily) {
-      daily = new DailyStock({
-        date: today,
-        products: [],
-      });
-    }
-
-    let existing = daily.products.find(
-      (p) => p.productname === medicinename
-    );
-
-    const opening = medicine.stock;
-
-    let change = 0;
-
-    // 🔥 STOCK TYPE LOGIC
-    switch (type) {
-      case "SALE":
-        change = -Math.abs(stock);
-        break;
-
-      case "RETURN":
-        change = Math.abs(stock);
-        break;
-
-      case "PURCHASE":
-        change = Math.abs(stock);
-        break;
-
-      case "ADJUST":
-        change = Number(stock);
-        break;
-
-      default:
-        change = Number(stock);
-    }
-
-    const newStock = opening + change;
-
-    // ❌ Prevent negative stock
-    if (newStock < 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Insufficient stock",
-      });
-    }
-
-    // ✅ Update main medicine stock
-    await medicineModel.findOneAndUpdate(
-      { medicinename },
-      {
-        $inc: { stock: change },
-        $set: { unitprice },
-      }
-    );
-
-    // ✅ Update daily stock
-    if (existing) {
-      if (type === "SALE") {
-        existing.sold += Math.abs(stock);
+      // 👉 If stock added → increase MR total
+      if (stock > 0) {
+        lastMR.totalamount += totalChange;
+        lastMR.dueamount += totalChange;
       }
 
-      if (type === "RETURN") {
-        existing.sold -= Math.abs(stock);
+      // 👉 If stock returned → decrease MR total
+      if (stock < 0) {
+        lastMR.totalamount -= Math.abs(totalChange);
+        lastMR.dueamount -= Math.abs(totalChange);
       }
 
-      existing.closingstock = newStock;
-    } else {
-      daily.products.push({
-        productname: medicinename,
-        companyName: medicine.companyname,
-        openingstock: opening,
-        sold: type === "SALE" ? Math.abs(stock) : 0,
-        closingstock: newStock,
-      });
+      await lastMR.save();
     }
-
-    await daily.save();
 
     return res.status(200).json({
       success: true,
-      message: "Stock updated successfully",
+      message: "Stock + MR updated successfully",
+      medicine: updatedMedicine,
     });
+
   } catch (error) {
-    console.log("Stock Error:", error);
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Server Error",
+      error: error.message,
     });
   }
 };

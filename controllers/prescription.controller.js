@@ -29,12 +29,12 @@ export const getPrescriptions = async (req, res) => {
 export const getAPrescription = async (req,res) => {
   try {
     const {patientname} = req.query;
-    const PrescriptionData = await Prescription.findOne({ 
+    const PrescriptionData = await Prescription.find({ 
       $or:[
                 {patientname:new RegExp(patientname,"i")},
                 {opdno:patientname }
             ]
-    }).sort({date:-1});
+    }).sort({createdAt: -1});
 
    if (!PrescriptionData){
             return res.status(404).json({

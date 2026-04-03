@@ -1,5 +1,7 @@
 import mrModel from "../models/mr.model.js";
-
+import DailyStock from "../models/dailyStocks.model.js";
+import transactionModel from "../models/transaction.model.js";
+import medicineModel from "../models/medicine.model.js";
 // get all Mr's
 export const getAllMr=async(req,res)=>{
 try {
@@ -68,20 +70,58 @@ export const getMrByName = async (req, res) => {
 };
 
 //  add Mr's to
-export const postMr=async(req,res)=>{
-    try {
-        const mr = await mrModel.create(req.body);
-        return res.status(201).json({
-            success:true,
-            createdMr:mr
-        })
-    } catch (error) {
-        return res.status(500).json({
-            success:false,
-            message:'Error in adding Data '+error
-        })
+export const postMr = async (req, res) => {
+  try {
+    const { productlist, companyname, mrname } = req.body;
+
+    // 1️⃣ Save MR first
+    const newMr = await mrModel.create(req.body);
+
+    // 2️⃣ Loop products
+    for (const item of productlist) {
+      const medName = item.medicinename?.trim();
+      if(!medName){
+        throw new Error("Medicine Name is missing")
+      }
+      
+      let med = await medicineModel.findOne({
+        medicinename:medName
+      })
+      if (!med) {
+        // create new medicine
+        med = await medicineModel.create({
+          medicinename: medName,
+          companyname: companyname,
+          mrname: mrname,
+          stock: Number(item.qty),
+          unitprice: Number(item.unitprice),
+          totalprice: Number(item.qty) * Number(item.unitprice)
+        });
+      } else {
+        // update existing stock
+        med = await medicineModel.findByIdAndUpdate(
+          med._id,
+          { $inc: { stock: item.qty} },
+          {$set:{totalprice:Number(item.qty)*Number(item.unitprice)}},
+          { new: true }
+        );
+      }
+
+      // 👉 AFTER THIS: add transaction + daily stock (as told before)
     }
-}
+
+    return res.status(201).json({
+      success: true,
+      message: "MR + stock updated"
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+};
 // update MR dueamount
 export const updateMr = async (req,res) => {
     try {

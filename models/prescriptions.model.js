@@ -10,7 +10,8 @@ const productSchema = new mongoose.Schema({
 const treatmentSchema = new mongoose.Schema({
   name: { type: String , lowercase:true },
   price:Number,
-  sessions:Number
+  sessions:Number,
+  completesessions:Number
 },{_id:false}
 );
 
@@ -20,7 +21,6 @@ const PrescriptionSchema = new mongoose.Schema(
     date: { type: String },
     opdno:{type:String},
     nextAppointmentDate: { type: String, default:'No Appointment'},
-    
     productCost:{type:Number},
     treatmentCost:{type:Number,default:0},
     totalCost:{type:Number},
@@ -30,7 +30,7 @@ const PrescriptionSchema = new mongoose.Schema(
     products:{type: [productSchema],default:[]},
     treatments:{type: [treatmentSchema],default:[]},
     remark:String
-  }
+  },{timestamps:true}
 );
 
 const Prescription = mongoose.model("Prescription", PrescriptionSchema, "Prescriptions");

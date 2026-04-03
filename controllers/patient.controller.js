@@ -47,7 +47,8 @@ export const getPatient=async (req,res) => {
         const singlePatient=await Patient.findOne({
             $or:[
                 {name:new RegExp(name,"i")},
-                {opdno:name }
+                {opdno:name },
+                {history:name}
             ]
         });
         if (!singlePatient){

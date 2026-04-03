@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const productSchema= new mongoose.Schema({
   medicinename:String,
-  stock:Number,
+  qty:Number,
   unitprice:Number,
   totalprice:Number
 },{_id:false})

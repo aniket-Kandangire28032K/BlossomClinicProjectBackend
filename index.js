@@ -11,6 +11,7 @@ import Mr from './routes/mr.route.js'
 import Exprenses from "./routes/expenses.route.js"
 import Staff from "./routes/staff.route.js"
 import Stock from "./routes/stock.route.js"
+import DailyStockRoute from './routes/dailysales.route.js'
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -28,6 +29,7 @@ app.use('/api',Mr)
 app.use('/api',Exprenses)
 app.use('/api',Stock)
 app.use('/api/staff',Staff)
+app.use('/api/daily-sales',DailyStockRoute)
 
 
 // DB Connection

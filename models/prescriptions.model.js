@@ -2,14 +2,17 @@ import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
   name: { type: String , lowercase:true },
+  companyname:{type: String ,trim:true},
   remark:{type:String,lowercase:true},
   price:Number,
+  unitprice:Number,
   qty:Number
 },{_id:false}
 );
 const treatmentSchema = new mongoose.Schema({
   name: { type: String , lowercase:true },
   price:Number,
+  persession:Number,
   sessions:Number,
   completesessions:Number
 },{_id:false}

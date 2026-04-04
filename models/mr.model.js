@@ -6,7 +6,12 @@ const productSchema= new mongoose.Schema({
   unitprice:Number,
   totalprice:Number
 },{_id:false})
-
+const hisotrySchema = new mongoose.Schema({
+  paymentDate:String,
+  paymentAmount:Number
+},{
+  _id:false
+})
 const mrSchema = new mongoose.Schema({
   companyname: {
     type: String,
@@ -55,6 +60,10 @@ const mrSchema = new mongoose.Schema({
   },
   lastpayment:{
     type:Number
+  },
+  paymentHistory:{
+    type:[hisotrySchema],
+    default:[]
   }
 },{
   createdAt:true

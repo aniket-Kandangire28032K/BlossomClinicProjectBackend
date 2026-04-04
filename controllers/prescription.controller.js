@@ -1,16 +1,86 @@
 import Prescription from "../models/prescriptions.model.js";
-
+import DailyStock from "../models/dailyStocks.model.js";
+import medicineModel from "../models/medicine.model.js";
 export const addPrescription = async (req, res) => {
-  // Post Request
   try {
     const newPrescription = new Prescription(req.body);
+    
+
+    const Products = req.body.products;
+    const today = new Date()
+      .toISOString()
+      .split("T")[0]
+      .split("-")
+      .reverse()
+      .join("/");
+
+    let dailyStock = await DailyStock.findOne({ date: today });
+
+    // 🆕 create if not exists
+    if (!dailyStock) {
+      dailyStock = new DailyStock({
+        date: today,
+        products: []
+      });
+    }
+
+    // 🔥 MAIN LOGIC
+    for (const item of Products) {
+      const medicine = await medicineModel.findOne({medicinename: item.name});
+
+      if (!medicine) {
+        return res.status(400).json({
+          success: false,
+          message: `${item.name} not found in Medicine DB`
+        });
+      }
+
+      // ❌ prevent overselling
+      if (medicine.stock < item.qty) {
+        return res.status(400).json({
+          success: false,
+          message: `Not enough stock for ${item.name}`
+        });
+      }
+
+      const openingStock = medicine.stock;
+
+      // 🔽 reduce real stock
+      medicine.stock -= item.qty;
+      await medicine.save();
+
+      // 🔍 check in daily stock
+      let product = dailyStock.products.find(
+        (p) =>
+          p.productname.toLowerCase() === item.name.toLowerCase()
+      );
+
+      if (product) {
+        // update existing
+        product.sold += item.qty;
+        product.closingstock -= item.qty;
+
+      } else {
+        // add new product
+        dailyStock.products.push({
+          productname: item.name,
+          companyName: medicine.companyname || "",
+          openingstock: openingStock,
+          closingstock: openingStock - item.qty,
+          sold: item.qty
+        });
+      }
+    }
+
+    await dailyStock.save();
     await newPrescription.save();
 
     res.status(201).json({
       success: true,
-      message: "Prescription saved",
+      message: "Prescription saved & stock updated",
       data: newPrescription
     });
+
   } catch (error) {
     res.status(500).json({ success: false, error });
   }

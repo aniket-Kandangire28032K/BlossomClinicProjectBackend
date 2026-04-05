@@ -1,7 +1,10 @@
 import medicineModel from "../models/medicine.model.js";
-import DailyStock from "../models/dailyStocks.model.js" 
+import DailyStock from "../models/dailyStocks.model.js";
 import mrModel from "../models/mr.model.js";
 
+const today = new Date()
+  .toISOString()
+  .split("T")[0].split('-').reverse().join('/')
 // ✅ Get all medicines
 export const getAllMedicine = async (req, res) => {
   try {
@@ -99,7 +102,7 @@ export const updatemed = async (req, res) => {
           stockout: stock < 0 ? Math.abs(stock) : 0,
         },
       },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedMedicine) {
@@ -110,7 +113,8 @@ export const updatemed = async (req, res) => {
     }
 
     // ✅ 2. Find LAST MR entry for this company
-    const lastMR = await mrModel.findOne({ companyname })
+    const lastMR = await mrModel
+      .findOne({ companyname })
       .sort({ createdAt: -1 });
 
     if (lastMR) {
@@ -136,7 +140,6 @@ export const updatemed = async (req, res) => {
       message: "Stock + MR updated successfully",
       medicine: updatedMedicine,
     });
-
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -146,42 +149,55 @@ export const updatemed = async (req, res) => {
   }
 };
 
-// 🔥 Used in Dashboard (SALE)
-export const updateMedicineStock = async (req, res) => {
+export const updateSingleMedicineStock = async (req, res) => {
   try {
-    const { products } = req.body;
+    const { medicinename, stock, unitprice } = req.body;
 
-    if (!products || !Array.isArray(products)) {
-      return res.status(400).json({
-        success: false,
-        message: "Products array required",
-      });
+    if (!medicinename) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Medicine name is required" });
     }
-
-    for (const item of products) {
-      const qty = Number(item.qty);
-
-      if (!item.name || isNaN(qty)) continue;
-
-      await updatemed({
-        body: {
-          medicinename: item.name,
-          stock: qty,
-          unitprice: 0,
-          type: "SALE",
-        },
-      }, { status: () => ({ json: () => {} }) });
+    const med = await medicineModel.findOne({ medicinename });
+    if (!med) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Medicine not found" });
     }
+    // 1️⃣ Calculate new stock
+    const newStock = med.stock + Number(stock || 0);
+    // 2️⃣ Determine new unit price
+    const newUnitPrice =
+      unitprice !== undefined ? Number(unitprice) : med.unitprice;
+    // 3️⃣ Calculate total price using new values
+    const newTotalPrice = parseFloat((newStock * newUnitPrice).toFixed(2));
 
-    res.status(200).json({
+    med.stock = newStock;
+    med.unitprice = newUnitPrice;
+    med.totalprice = newTotalPrice;
+
+    await med.save();
+    const dailyStock = await DailyStock.findOne({
+      date: today,
+    });
+    if(!dailyStock){
+      console.log("dailyStock Not found")
+    }
+    const product = dailyStock.products.find(p => p.productname === med.medicinename);
+    if(!product){
+      return res.status(404).json({ message: "Product not found in daily stock" });
+    }
+    product.closingstock = Number(product.closingstock) + Number(stock); 
+    
+    if (product.closingstock < 0) product.closingstock = 0;
+    await dailyStock.save();
+    
+    return res.status(200).json({
       success: true,
-      message: "Medicine stock updated (SALE)",
+      message: "Medicine updated successfully",
+      medicine: newTotalPrice,
     });
-
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };

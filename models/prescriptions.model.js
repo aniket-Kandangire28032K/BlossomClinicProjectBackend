@@ -1,5 +1,14 @@
 import mongoose from "mongoose";
 
+const historySchema = new mongoose.Schema({
+  session:Number,
+  sessionDate:String,
+  status:{
+    type:String,
+    enum:["paid","pending","unpaid"],
+    default:'unpaid'
+  }
+},{ _id:false})
 const productSchema = new mongoose.Schema({
   name: { type: String , lowercase:true },
   companyname:{type: String ,trim:true},
@@ -14,7 +23,11 @@ const treatmentSchema = new mongoose.Schema({
   price:Number,
   persession:Number,
   sessions:Number,
-  completesessions:Number
+  completesessions:Number,
+  sessionhistory:{
+    type:[historySchema],
+    default:[]
+  }
 },{_id:false}
 );
 

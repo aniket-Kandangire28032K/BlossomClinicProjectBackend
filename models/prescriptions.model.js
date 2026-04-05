@@ -45,7 +45,12 @@ const PrescriptionSchema = new mongoose.Schema(
     balanceamount:{type:Number},
     products:{type: [productSchema],default:[]},
     treatments:{type: [treatmentSchema],default:[]},
-    remark:String
+    remark:String,
+    paymentMethod:{
+      type:String,
+      enum:["cash","UPI","swipe machine"],
+      default:"cash"
+    }
   },{timestamps:true}
 );
 

@@ -23,10 +23,11 @@ export const getAllUsers =async(req,res)=>{
             users
         })
     } catch (error) {
-        console.log(error)
+        
         return res.status(404).json({
             success:false,
-            message:'internal server error'
+            message:'internal server error',
+            error
         })       
     }
 }

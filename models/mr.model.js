@@ -16,11 +16,13 @@ const mrSchema = new mongoose.Schema({
   companyname: {
     type: String,
     trim: true,
+    required:true
   },
   mrname: {
     type: String,
     trim: true,
     lowercase: true,
+    required:true
   },
   contact: { type: String, trim: true, lowercase: true },
   email: {
@@ -37,12 +39,15 @@ const mrSchema = new mongoose.Schema({
   },
   paidamount: {
     type: Number,
+    required:true
   },
   dueamount: {
     type: Number,
+
   },
   totalamount: {
     type: Number,
+    required:true
   },
   date:{
     type:String,
@@ -53,7 +58,8 @@ const mrSchema = new mongoose.Schema({
     trim:true
   },paymentMethod:{
       type:String,
-    trim:true
+    trim:true,
+    required:true
   },
   lastpaymentdate:{
     type:String,trim:true
